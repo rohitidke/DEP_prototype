@@ -9,11 +9,30 @@
   style="width: 100%; height: 400px; display: block;"
 >
 </highcharts-chart> -->
-
+<div *ngIf="showClusters">
 <highcharts-chart id="container" [Highcharts]="Highcharts" [constructorType]="chartConstructor" [options]="chartOptions"
 	[(update)]="updateFlag" style="width: 100%; height: 400px; display: block;">
 </highcharts-chart>
+</div>
+<h4>Enter country:</h4>
+<input #nameInput type="text" class="form-control" placeholder=''/>
+<button class="btn btn-outline-success" (click)="getDataFromDEP()">Fetch Data</button>
+<!-- <div *ngIf="geojson">
+  <ul>
+    <li *ngFor="let card of geojson">
+      {{card}}
+       <span>{{card.DepartmentId}}</span>
+       <span>{{card.DepartmentName}}</span>
+       <span>{{card.DepartmentGeometry}}</span>
+    </li>
+  </ul>
+</div> -->
 
+<div *ngFor="let geo of geojson">
+  <p>{{geo.DepartmentName}}</p>
+  <p>{{geo.DepartmentId}}</p>
+  <p>{{geo.DepartmentGeometry | json}}</p>
+</div>
 <!-- <div *ngIf="showClusters">
   <highcharts-chart [Highcharts]="Highcharts" [options]="bubblechart" [(update)]="updateFlag" [oneToOne]="oneToOneFlag"
     style="width: 100%; height: 800px; display: block;">

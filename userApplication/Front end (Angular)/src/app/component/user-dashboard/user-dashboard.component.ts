@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
 // import * as Highcharts from 'highcharts';
@@ -24,8 +24,14 @@ export class UserDashboardComponent implements OnInit {
   showError = false
   oneToOneFlag = false
   loading = false
+  geojson: any = [];
   chartConstructor = 'mapChart';
   chartData = [{ code3: "ABW", z: 105 }, { code3: "AFG", z: 35530 }];
+  @ViewChild('nameInput')
+  nameInput!: ElementRef;
+  country: any = ""
+  countryJson: any = {}
+  chartOptions!: Highcharts.Options;
 
   linechart: any = {
     series: [
@@ -43,6 +49,8 @@ export class UserDashboardComponent implements OnInit {
 
 
   constructor(private route: Router, private searchService: SearchService) { }
+  ngOnInit(): void {
+  }
 
   bubblechart: any = {
     chart: {
@@ -69,11 +77,43 @@ export class UserDashboardComponent implements OnInit {
     },
   };
 
+  getDataFromDEP() {
+    this.showClusters = false;
+    this.country = this.nameInput.nativeElement.value
+    let countryid = "0"
+    if (this.country=='germany')
+    {
+      countryid = "14"
+    }
+    else if (this.country=='czech')
+    {
+      countryid = "15"
+    }
+    else if (this.country=='austria')
+    {
+      countryid = "16"
+    }
+
+    this.searchService.getSearchResults(countryid)
+      .subscribe((data: any) => {
+        this.geojson = data;
+        
+        // this.geojson.push(data);
+        console.log(this.geojson)
+        this.countryJson = this.geojson[0]['DepartmentGeometry']
+        this.showClusters = true;
+        this.updateFlag = true;
+        this.updatechart();
+      });
+      
+
+  }
+
   callPostSearchResultsAPI(searchStr: any) {
     this.loading = true
     this.showClusters = false;
     this.showError = false;
-    this.searchService.postSearchResults(searchStr)
+    this.searchService.getSearchResults(searchStr)
       .subscribe((data: any) => {
         if (data.length === 0) {
           this.showClusters = false;
@@ -92,7 +132,60 @@ export class UserDashboardComponent implements OnInit {
       });
   }
 
-  ngOnInit(): void {
+  updatechart(): void {
+    this.chartOptions = {
+      chart: {
+        map: this.countryJson
+      },
+      title: {
+        text: this.country+" Map"
+      },
+      accessibility: {
+        typeDescription: 'Map of Country'
+      },
+      mapNavigation: {
+        enabled: true,
+        buttonOptions: {
+          verticalAlign: 'bottom'
+        }
+      },
+      legend: {
+        enabled: true
+      },
+      colorAxis: {
+        tickPixelInterval: 100
+      },
+      series: [
+        {
+          name: 'Random data',
+          type: 'map',
+          dataLabels: {
+            enabled: true,
+            format: '{point.properties.postal-code}'
+          },
+          keys: ['hasc', 'value'],
+          joinBy: 'hasc',
+        //   data:  [
+        //     ['DE.SH', 728],
+        //     ['DE.BE', 710],
+        //     ['DE.MV', 963],
+        //     ['DE.HB', 541],
+        //     ['DE.HH', 622],
+        //     ['DE.RP', 866],
+        //     ['DE.SL', 398],
+        //     ['DE.BY', 785],
+        //     ['DE.SN', 223],
+        //     ['DE.ST', 605],
+        //     ['DE.NW', 237],
+        //     ['DE.BW', 157],
+        //     ['DE.HE', 134],
+        //     ['DE.NI', 136],
+        //     ['DE.TH', 704],
+        //     ['DE.', 361]
+        // ],
+        }
+      ]
+    };
   }
 
   logout() {
@@ -100,62 +193,6 @@ export class UserDashboardComponent implements OnInit {
     this.route.navigate(['/']);
   }
 
-  chartOptions: Highcharts.Options = {
-    chart: {
-      map: germanyMap
-    },
-    title: {
-      text: 'Germany Index'
-    },
-    subtitle: {
-      text:
-        'Dummy data'
-    },
-    accessibility: {
-      typeDescription: 'Map of Germany.'
-    },
-    mapNavigation: {
-      enabled: true,
-      buttonOptions: {
-        verticalAlign: 'bottom'
-      }
-    },
-    legend: {
-      enabled: true
-    },
-    colorAxis: {
-      tickPixelInterval: 100
-    },
-    series: [
-      {
-        name: 'Random data',
-        type: 'map',
-        dataLabels: {
-          enabled: true,
-          format: '{point.properties.postal-code}'
-        },
-        keys: ['hasc', 'value'],
-        joinBy: 'hasc',
-        data:  [
-          ['DE.SH', 728],
-          ['DE.BE', 710],
-          ['DE.MV', 963],
-          ['DE.HB', 541],
-          ['DE.HH', 622],
-          ['DE.RP', 866],
-          ['DE.SL', 398],
-          ['DE.BY', 785],
-          ['DE.SN', 223],
-          ['DE.ST', 605],
-          ['DE.NW', 237],
-          ['DE.BW', 157],
-          ['DE.HE', 134],
-          ['DE.NI', 136],
-          ['DE.TH', 704],
-          ['DE.', 361]
-      ],
-      }
-    ]
-  };
+
 
 }

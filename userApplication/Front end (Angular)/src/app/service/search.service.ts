@@ -8,7 +8,7 @@ export class SearchService {
 
   constructor(private http: HttpClient) { }
 
-  rootURL = 'http://localhost:8080';
+  rootURL = 'http://127.0.0.1:8000/';
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -16,12 +16,12 @@ export class SearchService {
     })
   }
 
-  getSearchResults() {
-    return this.http.get(this.rootURL + '/getSearchResultsClusters');
-  }
+  // getSearchResults() {
+  //   return this.http.get(this.rootURL);
+  // }
 
-  postSearchResults(searchString: any) {
-    return this.http.post(this.rootURL + '/search', searchString, this.httpOptions);
+  getSearchResults(searchString: any) {
+    return this.http.get(this.rootURL + searchString);
   }
 
 }
