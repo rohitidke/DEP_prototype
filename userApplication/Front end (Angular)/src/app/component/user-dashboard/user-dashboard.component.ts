@@ -24,7 +24,9 @@ export class UserDashboardComponent implements OnInit {
   showError = false
   oneToOneFlag = false
   loading = false
+  showdata = false
   geojson: any = [];
+  allcountrydata: any = {}
   chartConstructor = 'mapChart';
   chartData = [{ code3: "ABW", z: 105 }, { code3: "AFG", z: 35530 }];
   @ViewChild('nameInput')
@@ -33,49 +35,10 @@ export class UserDashboardComponent implements OnInit {
   countryJson: any = {}
   chartOptions!: Highcharts.Options;
 
-  linechart: any = {
-    series: [
-      {
-        data: [7, 1, 8, 2, 5, 3],
-      },
-    ],
-    chart: {
-      type: 'line',
-    },
-    title: {
-      text: 'linechart',
-    },
-  };
-
 
   constructor(private route: Router, private searchService: SearchService) { }
   ngOnInit(): void {
   }
-
-  bubblechart: any = {
-    chart: {
-      type: 'packedbubble'
-    },
-    series: null,
-    plotOptions: {
-      packedbubble: {
-        layoutAlgorithm: {
-          gravitationalConstant: 0.05,
-          splitSeries: true,
-          seriesInteraction: false,
-          dragBetweenSeries: true,
-          parentNodeLimit: true
-        }
-      }
-    },
-    tooltip: {
-      useHTML: true,
-      pointFormat: '<b>Title:</b> {point.name}<br><b>Relevance score:</b> {point.value}<br><b>Content:</b> {point.content}'
-    },
-    title: {
-      text: 'Search Result Clusters',
-    },
-  };
 
   getDataFromDEP() {
     this.showClusters = false;
@@ -105,30 +68,21 @@ export class UserDashboardComponent implements OnInit {
         this.updateFlag = true;
         this.updatechart();
       });
-      
-
   }
 
-  callPostSearchResultsAPI(searchStr: any) {
-    this.loading = true
+  fetchCountryData() {
     this.showClusters = false;
-    this.showError = false;
-    this.searchService.getSearchResults(searchStr)
+    this.country = this.nameInput.nativeElement.value
+    const inputJson = {
+      "application": "harran_university",
+      "table": "employeeapp_departments"
+    }
+
+    this.searchService.fetchData(inputJson)
       .subscribe((data: any) => {
-        if (data.length === 0) {
-          this.showClusters = false;
-          this.showError = true;
-          this.loading = false
-        }
-        else {
-          this.loading = false
-          this.showClusters = true;
-          this.showError = false;
-          this.bubblechart.series = data
-          console.log(this.bubblechart)
-          this.updateFlag = true;
-          this.oneToOneFlag = true;
-        }
+        this.allcountrydata = data;
+        console.log(this.allcountrydata)
+        this.showdata = true
       });
   }
 

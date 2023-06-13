@@ -33,6 +33,13 @@
   <p>{{geo.DepartmentId}}</p>
   <p>{{geo.DepartmentGeometry | json}}</p>
 </div>
+
+
+
+<button class="btn btn-outline-success" (click)="fetchCountryData()">Fetch All Country Data</button>
+<div *ngIf="showdata">
+  <p>{{allcountrydata | json}}</p>
+</div>
 <!-- <div *ngIf="showClusters">
   <highcharts-chart [Highcharts]="Highcharts" [options]="bubblechart" [(update)]="updateFlag" [oneToOne]="oneToOneFlag"
     style="width: 100%; height: 800px; display: block;">

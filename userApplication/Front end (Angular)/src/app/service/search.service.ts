@@ -24,4 +24,8 @@ export class SearchService {
     return this.http.get(this.rootURL + searchString);
   }
 
+  fetchData(payload: any) {
+    return this.http.post(this.rootURL + "fetch_data", payload);
+  }
+
 }
